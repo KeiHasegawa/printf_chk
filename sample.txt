@@ -1,0 +1,11 @@
+    int printf(const char*, ...);
+
+    char* p;
+    int i;
+    long int li;
+
+    int main()
+    {
+      printf("%s %d %d\n", p, i, li);
+      return 0;
+    }
