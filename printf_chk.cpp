@@ -88,7 +88,7 @@ namespace warning {
   void no_arg(const file_t& file, string func);
   void unknown_designator(const file_t& file, std::string designator);
   void invalid_designator(const file_t& file,
-                          int nth, string designator, const type* T);
+                          int nth, string text, const type* T);
 }  // end of namespace warning
 
 namespace error {
@@ -96,7 +96,7 @@ namespace error {
   using namespace COMPILER;
   void numof_arg(const file_t& file, string fmt, int require, int specified);
   void invalid_designator(const file_t& file, int nth,
-                          string designator, const type* T);
+                          string text, const type* T);
 }  // end of namespace error
 
 inline bool cmpx(COMPILER::tac* ptr, COMPILER::var* v)
@@ -123,20 +123,20 @@ accumulate(InIt1 begin1, InIt1 end1, InIt2 begin2, V v, Fn op)
 namespace printf_family {
   using namespace std;
   using namespace COMPILER;
-  typedef void (*HANDLER)(int nth, string designator, const type* T, const file_t& file);
-  void h_int(int nth, string designator, const type* T, const file_t& file);
-  void h_int_ptr(int nth, string designator, const type* T, const file_t& file);
-  void h_double(int nth, string designator, const type* T, const file_t& file);
-  void h_ptr(int nth, string designator, const type* T, const file_t& file);
-  void h_char_ptr(int nth, string designator, const type* T, const file_t& file);
-  void h_uint(int nth, string designator, const type* T, const file_t& file);
-  void h_long(int nth, string designator, const type* T, const file_t& file);
-  void h_long_ptr(int nth, string designator, const type* T, const file_t& file);
-  void h_ulong(int nth, string designator, const type* T, const file_t& file);
-  void h_longdouble(int nth, string designator, const type* T, const file_t& file);
-  void h_longlong(int nth, string designator, const type* T, const file_t& file);
-  void h_longlong_ptr(int nth, string designator, const type* T, const file_t& file);
-  void h_ulonglong(int nth, string designator, const type* T, const file_t& file);
+  typedef void (*HANDLER)(int nth, string text, const type* T, const file_t& file);
+  void h_int(int nth, string text, const type* T, const file_t& file);
+  void h_int_ptr(int nth, string text, const type* T, const file_t& file);
+  void h_double(int nth, string text, const type* T, const file_t& file);
+  void h_ptr(int nth, string text, const type* T, const file_t& file);
+  void h_char_ptr(int nth, string text, const type* T, const file_t& file);
+  void h_uint(int nth, string text, const type* T, const file_t& file);
+  void h_long(int nth, string text, const type* T, const file_t& file);
+  void h_long_ptr(int nth, string text, const type* T, const file_t& file);
+  void h_ulong(int nth, string text, const type* T, const file_t& file);
+  void h_longdouble(int nth, string text, const type* T, const file_t& file);
+  void h_longlong(int nth, string text, const type* T, const file_t& file);
+  void h_longlong_ptr(int nth, string text, const type* T, const file_t& file);
+  void h_ulonglong(int nth, string text, const type* T, const file_t& file);
   struct htable_t : map<string, HANDLER> {
     htable_t()
     {
@@ -204,7 +204,7 @@ inline const COMPILER::type* simplify(const COMPILER::type* T)
 }
 
 void
-printf_family::h_int(int nth, std::string designator,
+printf_family::h_int(int nth, std::string text,
                      const COMPILER::type* T, const COMPILER::file_t& file)
 {
   using namespace COMPILER;
@@ -214,13 +214,13 @@ printf_family::h_int(int nth, std::string designator,
   if (id == type::INT)
     return;
   if (id == type::UINT)
-    warning::invalid_designator(file, nth, designator, org);
+    warning::invalid_designator(file, nth, text, org);
   else
-    error::invalid_designator(file, nth, designator, org);
+    error::invalid_designator(file, nth, text, org);
 }
 
 void
-printf_family::h_int_ptr(int nth, std::string designator,
+printf_family::h_int_ptr(int nth, std::string text,
                          const COMPILER::type* T, const COMPILER::file_t& file)
 {
   using namespace COMPILER;
@@ -229,11 +229,11 @@ printf_family::h_int_ptr(int nth, std::string designator,
   int id = T->m_id;
   if (id == type::INT || id == type::UINT || id == type::POINTER)
     return;
-  error::invalid_designator(file, nth, designator, org);
+  error::invalid_designator(file, nth, text, org);
 }
 
 void
-printf_family::h_double(int nth, std::string designator,
+printf_family::h_double(int nth, std::string text,
                         const COMPILER::type* T, const COMPILER::file_t& file)
 {
   using namespace COMPILER;
@@ -242,29 +242,29 @@ printf_family::h_double(int nth, std::string designator,
   int id = T->m_id;
   if (id == type::DOUBLE)
     return;
-  error::invalid_designator(file, nth, designator, org);
+  error::invalid_designator(file, nth, text, org);
 }
 
 void
-printf_family::h_ptr(int nth, std::string designator,
+printf_family::h_ptr(int nth, std::string text,
                      const COMPILER::type* T, const COMPILER::file_t& file)
 {
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
   if (T->m_id != type::POINTER)
-    error::invalid_designator(file, nth, designator, org);
+    error::invalid_designator(file, nth, text, org);
 }
 
 void
-printf_family::h_char_ptr(int nth, std::string designator,
+printf_family::h_char_ptr(int nth, std::string text,
                           const COMPILER::type* T, const COMPILER::file_t& file)
 {
   using namespace COMPILER;
   const type* org = T;
   T = T->unqualified();
   if (T->m_id != type::POINTER) {
-    error::invalid_designator(file, nth, designator, org);
+    error::invalid_designator(file, nth, text, org);
     return;
   }
   typedef const pointer_type PT;
@@ -272,11 +272,11 @@ printf_family::h_char_ptr(int nth, std::string designator,
   T = pt->referenced_type();
   T = T->unqualified();
   if (T->size() != 1)
-    error::invalid_designator(file, nth, designator, org);
+    error::invalid_designator(file, nth, text, org);
 }
 
 void
-printf_family::h_uint(int nth, std::string designator,
+printf_family::h_uint(int nth, std::string text,
                       const COMPILER::type* T, const COMPILER::file_t& file)
 {
   using namespace COMPILER;
@@ -286,14 +286,14 @@ printf_family::h_uint(int nth, std::string designator,
   if (id == type::UINT)
     return;
   if (id == type::INT) {
-    warning::invalid_designator(file, nth, designator, org);
+    warning::invalid_designator(file, nth, text, org);
     return;
   }
-  error::invalid_designator(file, nth, designator, org);
+  error::invalid_designator(file, nth, text, org);
 }
 
 void
-printf_family::h_long(int nth, std::string designator,
+printf_family::h_long(int nth, std::string text,
                       const COMPILER::type* T, const COMPILER::file_t& file)
 {
   using namespace COMPILER;
@@ -303,14 +303,14 @@ printf_family::h_long(int nth, std::string designator,
   if (id == type::LONG)
     return;
   if (id == type::ULONG) {
-    warning::invalid_designator(file, nth, designator, org);
+    warning::invalid_designator(file, nth, text, org);
     return;
   }
-  error::invalid_designator(file, nth, designator, org);
+  error::invalid_designator(file, nth, text, org);
 }
 
 void
-printf_family::h_long_ptr(int nth, std::string designator,
+printf_family::h_long_ptr(int nth, std::string text,
                           const COMPILER::type* T, const COMPILER::file_t& file)
 {
   using namespace COMPILER;
@@ -319,11 +319,11 @@ printf_family::h_long_ptr(int nth, std::string designator,
   int id = T->m_id;
   if (id == type::LONG || id == type::ULONG || id == type::POINTER)
     return;
-  error::invalid_designator(file, nth, designator, org);
+  error::invalid_designator(file, nth, text, org);
 }
 
 void
-printf_family::h_ulong(int nth, std::string designator,
+printf_family::h_ulong(int nth, std::string text,
                        const COMPILER::type* T, const COMPILER::file_t& file)
 {
   using namespace COMPILER;
@@ -333,14 +333,14 @@ printf_family::h_ulong(int nth, std::string designator,
   if (id == type::ULONG)
     return;
   if (id == type::LONG) {
-    warning::invalid_designator(file, nth, designator, org);
+    warning::invalid_designator(file, nth, text, org);
     return;
   }
-  error::invalid_designator(file, nth, designator, org);
+  error::invalid_designator(file, nth, text, org);
 }
 
 void
-printf_family::h_longdouble(int nth, std::string designator,
+printf_family::h_longdouble(int nth, std::string text,
                             const COMPILER::type* T,
                             const COMPILER::file_t& file)
 {
@@ -350,11 +350,11 @@ printf_family::h_longdouble(int nth, std::string designator,
   int id = T->m_id;
   if (id == type::LONG_DOUBLE)
     return;
-  error::invalid_designator(file, nth, designator, org);
+  error::invalid_designator(file, nth, text, org);
 }
 
 void
-printf_family::h_longlong(int nth, std::string designator,
+printf_family::h_longlong(int nth, std::string text,
                           const COMPILER::type* T, const COMPILER::file_t& file)
 {
   using namespace COMPILER;
@@ -364,13 +364,13 @@ printf_family::h_longlong(int nth, std::string designator,
   if (id == type::LONGLONG)
     return;
   if (id == type::ULONGLONG)
-    warning::invalid_designator(file, nth, designator, org);
+    warning::invalid_designator(file, nth, text, org);
   else
-    error::invalid_designator(file, nth, designator, org);
+    error::invalid_designator(file, nth, text, org);
 }
 
 void
-printf_family::h_longlong_ptr(int nth, std::string designator,
+printf_family::h_longlong_ptr(int nth, std::string text,
                               const COMPILER::type* T,
                               const COMPILER::file_t& file)
 {
@@ -380,11 +380,11 @@ printf_family::h_longlong_ptr(int nth, std::string designator,
   int id = T->m_id;
   if (id == type::LONGLONG || id == type::POINTER || id == type::ULONGLONG)
     return;
-  error::invalid_designator(file, nth, designator, org);
+  error::invalid_designator(file, nth, text, org);
 }
 
 void
-printf_family::h_ulonglong(int nth, std::string designator,
+printf_family::h_ulonglong(int nth, std::string text,
                            const COMPILER::type* T,
                            const COMPILER::file_t& file)
 {
@@ -395,9 +395,9 @@ printf_family::h_ulonglong(int nth, std::string designator,
   if (id == type::ULONGLONG)
     return;
   if (id == type::LONGLONG)
-    warning::invalid_designator(file, nth, designator, org);
+    warning::invalid_designator(file, nth, text, org);
   else
-    error::invalid_designator(file, nth, designator, org);
+    error::invalid_designator(file, nth, text, org);
 }
 
 inline int check_type(int nth,
@@ -491,6 +491,7 @@ devide::entry(std::string fmt,
       pos = percent(pos, fmt, designators, file);
   }
 }
+
 inline std::string::size_type
 devide::percent(std::string::size_type pos,
                 std::string fmt,
@@ -583,8 +584,8 @@ devide::percent(std::string::size_type pos,
 }
 
 namespace warning {
-  using namespace COMPILER;
   using namespace std;
+  using namespace COMPILER;
   void common_header(string msg, const file_t& file)
   {
     static string prev;
@@ -617,7 +618,7 @@ void warning::unknown_designator(const COMPILER::file_t& file, std::string s)
 namespace warning {
   using namespace std;
   using namespace COMPILER;
-  void invalid_designator_common(int nth, string designator, const type* T)
+  void invalid_designator_common(int nth, string text, const type* T)
   {
     cerr << "for ";
     switch (nth) {
@@ -627,7 +628,7 @@ namespace warning {
     default: cerr << nth + 1 << "th"; break;
     }
 
-    cerr << " designator `" << designator << "', ";
+    cerr << " designator `" << text << "', ";
     T->decl(cerr, "");
     cerr << " is specified." << '\n';
   }
@@ -636,11 +637,11 @@ namespace warning {
 void
 warning::invalid_designator(const COMPILER::file_t& file,
                             int nth,
-                            std::string designator,
+                            std::string text,
                             const COMPILER::type* T)
 {
   header(file);
-  invalid_designator_common(nth, designator, T);
+  invalid_designator_common(nth, text, T);
   ++counter;
 }
 
@@ -668,11 +669,11 @@ void error::numof_arg(const COMPILER::file_t& file,
 void
 error::invalid_designator(const COMPILER::file_t& file,
                           int nth,
-                          std::string designator,
+                          std::string text,
                           const COMPILER::type* T)
 {
   header(file);
-  warning::invalid_designator_common(nth, designator, T);
+  warning::invalid_designator_common(nth, text, T);
   ++counter;
 }
 
