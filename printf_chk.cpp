@@ -35,6 +35,25 @@ int generator_seed()
   return r;
 }
 
+extern "C" DLL_EXPORT
+int generator_sizeof(const COMPILER::type* T)
+{
+  using namespace COMPILER;
+  switch(T->m_id) {
+  case type::LONG:
+  case type::POINTER:
+    return 8;
+  default:
+    return T->size();
+  }
+}
+
+extern "C" DLL_EXPORT
+int generator_sizeof_type()
+{
+  return (int)c_compiler::type::ULONG;
+}
+
 std::string curr_func;
 
 inline bool cmpid(COMPILER::tac* tac, COMPILER::tac::id_t id)
@@ -125,7 +144,7 @@ namespace printf_family {
   using namespace COMPILER;
   typedef void (*HANDLER)(int nth, string text, const type* T, const file_t& file);
   void h_int(int nth, string text, const type* T, const file_t& file);
-  void h_int_ptr(int nth, string text, const type* T, const file_t& file);
+  void h_int_uint(int nth, string text, const type* T, const file_t& file);
   void h_double(int nth, string text, const type* T, const file_t& file);
   void h_ptr(int nth, string text, const type* T, const file_t& file);
   void h_char_ptr(int nth, string text, const type* T, const file_t& file);
@@ -150,11 +169,11 @@ namespace printf_family {
       (*this)["p"] = h_ptr;
       (*this)["s"] = h_char_ptr;
       (*this)["u"] = h_uint;
-      (*this)["x"] = h_int_ptr;
+      (*this)["x"] = h_int_uint;
       (*this)["E"] = h_double;
       (*this)["F"] = h_double;
       (*this)["G"] = h_double;
-      (*this)["X"] = h_int_ptr;
+      (*this)["X"] = h_int_uint;
       (*this)["ld"] = h_long;
       (*this)["le"] = h_double;
       (*this)["lf"] = h_double;
@@ -179,6 +198,9 @@ namespace printf_family {
       (*this)["LE"] = h_longdouble;
       (*this)["LF"] = h_longdouble;
       (*this)["LG"] = h_longdouble;
+      (*this)["zu"] = h_ulong;
+      (*this)["zx"] = h_ulong;
+      (*this)["zX"] = h_ulong;
     }
   } htable;
 } // end of namespace printf_family
@@ -220,14 +242,14 @@ printf_family::h_int(int nth, std::string text,
 }
 
 void
-printf_family::h_int_ptr(int nth, std::string text,
-                         const COMPILER::type* T, const COMPILER::file_t& file)
+printf_family::h_int_uint(int nth, std::string text,
+                          const COMPILER::type* T, const COMPILER::file_t& file)
 {
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
   int id = T->m_id;
-  if (id == type::INT || id == type::UINT || id == type::POINTER)
+  if (id == type::INT || id == type::UINT)
     return;
   error::invalid_designator(file, nth, text, org);
 }
@@ -570,6 +592,19 @@ devide::percent(std::string::size_type pos,
           c == 'F' || c == 'G') {
         designators.push_back(make_pair(text, key));
         return ++pos;
+      }
+      warning::unknown_designator(file, text);
+      return ++pos;
+    }
+  case 'z':
+    {
+      string key;
+      key += c, text += c;
+      c = fmt[++pos];
+      key += c, text += c;
+      if (c == 'u' || c == 'x' || c == 'X') {
+	designators.push_back(make_pair(text, key));
+	return ++pos;
       }
       warning::unknown_designator(file, text);
       return ++pos;
