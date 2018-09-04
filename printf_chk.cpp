@@ -219,7 +219,7 @@ inline const COMPILER::type* simplify(const COMPILER::type* T)
 {
   using namespace COMPILER;
   T = T->unqualified();
-  int id = T->m_id;
+  type::id id = T->m_id;
   if (id == type::ENUM) {
     typedef const enum_type ET;
     ET* et = static_cast<ET*>(T);
@@ -242,7 +242,7 @@ printf_family::h_int(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  int id = T->m_id;
+  type::id id = T->m_id;
   if (id == type::INT)
     return;
   if (id == type::UINT)
@@ -258,7 +258,7 @@ printf_family::h_int_uint(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  int id = T->m_id;
+  type::id id = T->m_id;
   if (id == type::INT || id == type::UINT)
     return;
   error::invalid_designator(file, nth, text, org);
@@ -271,7 +271,7 @@ printf_family::h_double(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  int id = T->m_id;
+  type::id id = T->m_id;
   if (id == type::DOUBLE)
     return;
   error::invalid_designator(file, nth, text, org);
@@ -314,7 +314,7 @@ printf_family::h_uint(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  int id = T->m_id;
+  type::id id = T->m_id;
   if (id == type::UINT)
     return;
   if (id == type::INT) {
@@ -331,7 +331,7 @@ printf_family::h_long(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  int id = T->m_id;
+  type::id id = T->m_id;
   if (id == type::LONG)
     return;
   if (id == type::ULONG) {
@@ -348,7 +348,7 @@ printf_family::h_long_ptr(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  int id = T->m_id;
+  type::id id = T->m_id;
   if (id == type::LONG || id == type::ULONG || id == type::POINTER)
     return;
   error::invalid_designator(file, nth, text, org);
@@ -361,7 +361,7 @@ printf_family::h_ulong(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  int id = T->m_id;
+  type::id id = T->m_id;
   if (id == type::ULONG)
     return;
   if (id == type::LONG) {
@@ -379,7 +379,7 @@ printf_family::h_longdouble(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  int id = T->m_id;
+  type::id id = T->m_id;
   if (id == type::LONG_DOUBLE)
     return;
   error::invalid_designator(file, nth, text, org);
@@ -392,7 +392,7 @@ printf_family::h_longlong(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  int id = T->m_id;
+  type::id id = T->m_id;
   if (id == type::LONGLONG)
     return;
   if (id == type::ULONGLONG)
@@ -409,7 +409,7 @@ printf_family::h_longlong_ptr(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  int id = T->m_id;
+  type::id id = T->m_id;
   if (id == type::LONGLONG || id == type::POINTER || id == type::ULONGLONG)
     return;
   error::invalid_designator(file, nth, text, org);
@@ -423,7 +423,7 @@ printf_family::h_ulonglong(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  int id = T->m_id;
+  type::id id = T->m_id;
   if (id == type::ULONGLONG)
     return;
   if (id == type::LONGLONG)
@@ -533,6 +533,7 @@ devide::percent(std::string::size_type pos,
   string text;
   text += fmt[pos];
   char c = fmt[++pos];
+  text += c;
   if (c == '%')
     return ++pos;
 
@@ -562,14 +563,14 @@ devide::percent(std::string::size_type pos,
   case 'F': case 'G': case 'X':
     {
       string key;
-      key += c, text += c;
+      key += c;
       designators.push_back(make_pair(text, key));
       return ++pos;
     }
   case 'l':
     {
       string key;
-      key += c, text += c;
+      key += c;
       c = fmt[++pos];
       key += c, text += c;
       if (c == 'd' || c == 'e' || c == 'f' || c == 'g' || c == 'i' ||
@@ -595,7 +596,7 @@ devide::percent(std::string::size_type pos,
   case 'L':
     {
       string key;
-      key += c, text += c;
+      key += c;
       c = fmt[++pos];
       key += c, text += c;
       if (c == 'e' || c == 'f' || c == 'g' || c == 'E' ||
@@ -609,12 +610,12 @@ devide::percent(std::string::size_type pos,
   case 'z':
     {
       string key;
-      key += c, text += c;
+      key += c;
       c = fmt[++pos];
       key += c, text += c;
       if (c == 'u' || c == 'x' || c == 'X') {
-        designators.push_back(make_pair(text, key));
-        return ++pos;
+	designators.push_back(make_pair(text, key));
+	return ++pos;
       }
       warning::unknown_designator(file, text);
       return ++pos;
