@@ -51,7 +51,11 @@ int generator_sizeof(const COMPILER::type* T)
 extern "C" DLL_EXPORT
 int generator_sizeof_type()
 {
+#ifdef GENERAL32BIT_SETTING
+  return (int)c_compiler::type::UINT;
+#else // GENERAL32BIT_SETTING  
   return (int)c_compiler::type::ULONG;
+#endif // GENERAL32BIT_SETTING
 }
 
 std::string curr_func;
@@ -159,48 +163,54 @@ namespace printf_family {
   struct htable_t : map<string, HANDLER> {
     htable_t()
     {
-      (*this)["c"] = h_int;
+      (*this)["c"] =
       (*this)["d"] = h_int;
-      (*this)["e"] = h_double;
-      (*this)["f"] = h_double;
+      (*this)["e"] =
+      (*this)["f"] =
       (*this)["g"] = h_double;
-      (*this)["i"] = h_int;
+      (*this)["i"] =
       (*this)["o"] = h_int;
       (*this)["p"] = h_ptr;
       (*this)["s"] = h_char_ptr;
       (*this)["u"] = h_uint;
       (*this)["x"] = h_int_uint;
-      (*this)["E"] = h_double;
-      (*this)["F"] = h_double;
+      (*this)["E"] =
+      (*this)["F"] =
       (*this)["G"] = h_double;
       (*this)["X"] = h_int_uint;
       (*this)["ld"] = h_long;
-      (*this)["le"] = h_double;
-      (*this)["lf"] = h_double;
+      (*this)["le"] =
+      (*this)["lf"] =
       (*this)["lg"] = h_double;
-      (*this)["li"] = h_long;
+      (*this)["li"] =
       (*this)["lo"] = h_long;
       (*this)["lu"] = h_ulong;
       (*this)["lx"] = h_long_ptr;
-      (*this)["lE"] = h_double;
-      (*this)["lF"] = h_double;
+      (*this)["lE"] =
+      (*this)["lF"] =
       (*this)["lG"] = h_double;
       (*this)["lX"] = h_long_ptr;
-      (*this)["lld"] = h_longlong;
-      (*this)["lli"] = h_longlong;
+      (*this)["lld"] =
+      (*this)["lli"] =
       (*this)["llo"] = h_longlong;
       (*this)["llu"] = h_ulonglong;
-      (*this)["llx"] = h_longlong_ptr;
+      (*this)["llx"] =
       (*this)["llX"] = h_longlong_ptr;
-      (*this)["Le"] = h_longdouble;
-      (*this)["Lf"] = h_longdouble;
-      (*this)["Lg"] = h_longdouble;
-      (*this)["LE"] = h_longdouble;
-      (*this)["LF"] = h_longdouble;
+      (*this)["Le"] =
+      (*this)["Lf"] =
+      (*this)["Lg"] =
+      (*this)["LE"] =
+      (*this)["LF"] =
       (*this)["LG"] = h_longdouble;
-      (*this)["zu"] = h_ulong;
-      (*this)["zx"] = h_ulong;
+#ifdef GENERAL32BIT_SETTING
+      (*this)["zu"] =
+      (*this)["zx"] =
+      (*this)["zX"] = h_uint;
+#else // GENERAL32BIT_SETTING
+      (*this)["zu"] =
+      (*this)["zx"] =
       (*this)["zX"] = h_ulong;
+#endif // GENERAL32BIT_SETTING
     }
   } htable;
 } // end of namespace printf_family
@@ -603,8 +613,8 @@ devide::percent(std::string::size_type pos,
       c = fmt[++pos];
       key += c, text += c;
       if (c == 'u' || c == 'x' || c == 'X') {
-	designators.push_back(make_pair(text, key));
-	return ++pos;
+        designators.push_back(make_pair(text, key));
+        return ++pos;
       }
       warning::unknown_designator(file, text);
       return ++pos;

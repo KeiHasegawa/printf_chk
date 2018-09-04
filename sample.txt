@@ -1,11 +1,12 @@
-    int printf(const char*, ...);
+int printf(const char*, ...);
 
-    char* p;
-    int i;
-    long int li;
-
-    int main()
-    {
-      printf("%s %d %d\n", p, i, li);
-      return 0;
-    }
+void test03(unsigned long int a)
+{
+  printf("`test03' called\n");
+  printf("%lu\n", a * 7UL);
+  printf("%lu\n", (-8UL) * a);
+  printf("%lu\n", a / 9UL);
+  printf("%lu\n", (-10UL) / a);
+  printf("%lu\n", a % 11UL);
+  printf("%lu\n", (-12UL) % a);
+}

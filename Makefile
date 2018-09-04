@@ -6,6 +6,12 @@ DEBUG_FLAG = -g
 PIC_FLAG = -fPIC
 CXXFLAGS = $(DEBUG_FLAG) $(PIC_FLAG) -I$(HCC1_SRCDIR) -w
 
+BIT = $(shell sizeoflongx8.exe)
+ifeq ($(BIT),32)
+  CXXFLAGS = -DGENERAL32BIT_SETTING
+endif
+
+
 UNAME := $(shell uname)
 DLL_FLAG =  -shared
 ifneq (,$(findstring Darwin,$(UNAME)))
