@@ -8,7 +8,7 @@ CXXFLAGS = $(DEBUG_FLAG) $(PIC_FLAG) -I$(HCC1_SRCDIR) -w
 
 BIT = $(shell sizeoflongx8.exe)
 ifeq ($(BIT),32)
-  CXXFLAGS = $(CXXFLAGS) -DGENERAL32BIT_SETTING
+  CXXFLAGS += -DGENERAL32BIT_SETTING
 endif
 
 
