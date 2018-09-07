@@ -36,15 +36,28 @@ int generator_seed()
 }
 
 extern "C" DLL_EXPORT
-int generator_sizeof(const COMPILER::type* T)
+int generator_sizeof(int n)
 {
   using namespace COMPILER;
-  switch(T->m_id) {
+
+  switch ((type::id)n) {
+  case type::SHORT:
+    return 2;
+  case type::INT:
+    return 4;
   case type::LONG:
-  case type::POINTER:
     return 8;
+  case type::LONGLONG:
+    return 8;
+  case type::FLOAT:
+    return 4;
+  case type::DOUBLE:
+    return 8;
+  case type::LONG_DOUBLE:
+    return 16;
   default:
-    return T->size();
+    assert((type::id)n == type::POINTER);
+    return 8;
   }
 }
 
@@ -57,6 +70,24 @@ int generator_sizeof_type()
   return (int)c_compiler::type::ULONG;
 #endif // GENERAL32BIT_SETTING
 }
+
+extern "C" DLL_EXPORT
+int generator_wchar_type()
+{
+  using namespace COMPILER;
+#ifdef linux
+#ifdef DEBIAN 
+  return (int)type::INT;
+#else // DEBIAN
+  return (int)type::LONG;
+#endif /// DEBIAN
+#endif // linux
+#ifdef __APPLE__
+  return (int)type::INT;
+#endif // __APPLE__
+  return (int)type::USHORT;
+}
+
 
 std::string curr_func;
 
