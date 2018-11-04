@@ -40,7 +40,7 @@ int generator_sizeof(int n)
 {
   using namespace COMPILER;
 
-  switch ((type::id)n) {
+  switch ((type::id_t)n) {
   case type::SHORT:
     return 2;
   case type::INT:
@@ -56,7 +56,7 @@ int generator_sizeof(int n)
   case type::LONG_DOUBLE:
     return 16;
   default:
-    assert((type::id)n == type::POINTER);
+    assert((type::id_t)n == type::POINTER);
     return 8;
   }
 }
@@ -93,7 +93,7 @@ std::string curr_func;
 
 inline bool cmpid(COMPILER::tac* tac, COMPILER::tac::id_t id)
 {
-  return tac->id == id;
+  return tac->m_id == id;
 }
 
 typedef std::vector<COMPILER::tac*>::const_iterator IT;
@@ -250,7 +250,7 @@ inline const COMPILER::type* simplify(const COMPILER::type* T)
 {
   using namespace COMPILER;
   T = T->unqualified();
-  type::id id = T->m_id;
+  type::id_t id = T->m_id;
   if (id == type::ENUM) {
     typedef const enum_type ET;
     ET* et = static_cast<ET*>(T);
@@ -273,7 +273,7 @@ printf_family::h_int(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  type::id id = T->m_id;
+  type::id_t id = T->m_id;
   if (id == type::INT)
     return;
   if (id == type::UINT)
@@ -289,7 +289,7 @@ printf_family::h_int_uint(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  type::id id = T->m_id;
+  type::id_t id = T->m_id;
   if (id == type::INT || id == type::UINT)
     return;
   error::invalid_designator(file, nth, text, org);
@@ -302,7 +302,7 @@ printf_family::h_double(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  type::id id = T->m_id;
+  type::id_t id = T->m_id;
   if (id == type::DOUBLE)
     return;
   error::invalid_designator(file, nth, text, org);
@@ -345,7 +345,7 @@ printf_family::h_uint(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  type::id id = T->m_id;
+  type::id_t id = T->m_id;
   if (id == type::UINT)
     return;
   if (id == type::INT) {
@@ -362,7 +362,7 @@ printf_family::h_long(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  type::id id = T->m_id;
+  type::id_t id = T->m_id;
   if (id == type::LONG)
     return;
   if (id == type::ULONG) {
@@ -379,7 +379,7 @@ printf_family::h_long_ptr(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  type::id id = T->m_id;
+  type::id_t id = T->m_id;
   if (id == type::LONG || id == type::ULONG || id == type::POINTER)
     return;
   error::invalid_designator(file, nth, text, org);
@@ -392,7 +392,7 @@ printf_family::h_ulong(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  type::id id = T->m_id;
+  type::id_t id = T->m_id;
   if (id == type::ULONG)
     return;
   if (id == type::LONG) {
@@ -410,7 +410,7 @@ printf_family::h_longdouble(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  type::id id = T->m_id;
+  type::id_t id = T->m_id;
   if (id == type::LONG_DOUBLE)
     return;
   error::invalid_designator(file, nth, text, org);
@@ -423,7 +423,7 @@ printf_family::h_longlong(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  type::id id = T->m_id;
+  type::id_t id = T->m_id;
   if (id == type::LONGLONG)
     return;
   if (id == type::ULONGLONG)
@@ -440,7 +440,7 @@ printf_family::h_longlong_ptr(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  type::id id = T->m_id;
+  type::id_t id = T->m_id;
   if (id == type::LONGLONG || id == type::POINTER || id == type::ULONGLONG)
     return;
   error::invalid_designator(file, nth, text, org);
@@ -454,7 +454,7 @@ printf_family::h_ulonglong(int nth, std::string text,
   using namespace COMPILER;
   const type* org = T;
   T = simplify(T);
-  type::id id = T->m_id;
+  type::id_t id = T->m_id;
   if (id == type::ULONGLONG)
     return;
   if (id == type::LONGLONG)
@@ -506,12 +506,12 @@ inline IT check(IT callp, IT begin)
   IT uu(u.base());
   uu += q->second.m_fmt;
   tac* ptr = *uu;
-  assert(ptr->id == tac::PARAM);
+  assert(ptr->m_id == tac::PARAM);
   RIT v = find_if(u, t, bind2nd(ptr_fun(cmpx), ptr->y));
   if (v == t)
     return callp + 1;
   tac* addr = *v;
-  if (addr->id != tac::ADDR)
+  if (addr->m_id != tac::ADDR)
     return callp + 1;
   usr* str = addr->y->usr_cast();
   if (!str)
