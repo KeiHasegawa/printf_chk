@@ -1,8 +1,11 @@
 #include "stdafx.h"
-
+#ifdef CXX_GENERATOR
+#include "cxx_core.h"
+#define COMPILER cxx_compiler
+#else // CXX_GENERATOR
 #include "c_core.h"
-
 #define COMPILER c_compiler
+#endif // CXX_GENERATOR
 
 #ifdef _MSC_VER
 #define DLL_EXPORT __declspec(dllexport)
@@ -64,10 +67,11 @@ int generator_sizeof(int n)
 extern "C" DLL_EXPORT
 int generator_sizeof_type()
 {
+  using namespace COMPILER;
 #ifdef GENERAL32BIT_SETTING
-  return (int)c_compiler::type::UINT;
+  return (int)COMPILER::type::UINT;
 #else // GENERAL32BIT_SETTING  
-  return (int)c_compiler::type::ULONG;
+  return (int)COMPILER::type::ULONG;
 #endif // GENERAL32BIT_SETTING
 }
 
