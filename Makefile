@@ -14,6 +14,7 @@ CXXFLAGS_FOR_XX = $(DEBUG_FLAG) $(PIC_FLAG) -I$(HCXX1_SRCDIR) -w \
 BIT = $(shell sizeoflongx8.exe)
 ifeq ($(BIT),32)
   CXXFLAGS += -DGENERAL32BIT_SETTING
+  CXXFLAGS_FOR_XX += -DGENERAL32BIT_SETTING
 endif
 
 
@@ -42,5 +43,5 @@ $(PRINTF_CHK_XX_DLL) : $(XX_OBJS)
 	$(CXX) $(CXXFLAGS_FOR_XX) $< -o $@ -c
 
 clean:
-	$(RM) *.o *~ $(PRINTF_CHK_DLL) x64 Debug .vs
+	$(RM) *.o *.obj *~ $(PRINTF_CHK_DLL) $(PRINTF_CHK_XX_DLL)
 	$(RM) -r .vs x64 Debug Release

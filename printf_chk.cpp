@@ -60,7 +60,11 @@ int generator_sizeof(int n)
     return 16;
   default:
     assert((type::id_t)n == type::POINTER);
+#ifdef GENERAL32BIT_SETTING
+    return 4;
+#else // GENERAL32BIT_SETTING
     return 8;
+#endif // GENERAL32BIT_SETTING
   }
 }
 
