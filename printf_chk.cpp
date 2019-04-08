@@ -23,6 +23,9 @@ int generator_seed()
 #else // CXX_GENERATOR
   r += 20000000;
 #endif // CXX_GENERATOR
+#ifdef _DEBUG
+  r +=  1000000;
+#endif // _DEBUG
 #ifdef WIN32
   r += 100000;
 #endif // WIN32
