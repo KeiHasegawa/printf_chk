@@ -44,4 +44,4 @@ $(PRINTF_CHK_XX_DLL) : $(XX_OBJS)
 
 clean:
 	$(RM) *.o *.obj *~ $(PRINTF_CHK_DLL) $(PRINTF_CHK_XX_DLL)
-	$(RM) -r .vs x64 Debug Release
+	$(RM) -r .vs x64 Debug Release DebugCXX ReleaseCXX
