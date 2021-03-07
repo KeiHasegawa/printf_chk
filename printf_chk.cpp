@@ -61,6 +61,10 @@ int generator_sizeof(int n)
     return 8;
   case type::LONG_DOUBLE:
     return 16;
+#ifdef CXX_GENERATOR
+  case type::FLOAT128:
+    return 64;
+#endif // CXX_GENERATOR
   default:
     assert((type::id_t)n == type::POINTER);
 #ifdef GENERAL32BIT_SETTING
